@@ -185,7 +185,7 @@ public class RNFetchBlobReq extends BroadcastReceiver implements Runnable {
                 }
                 // set headers
                 ReadableMapKeySetIterator it = headers.keySetIterator();
-                if(options.addAndroidDownloads.hasKey("mediaScannable") && options.addAndroidDownloads.hasKey("mediaScannable")) {
+                if(options.addAndroidDownloads.hasKey("mediaScannable") && options.addAndroidDownloads.getBoolean("mediaScannable")) {
                     req.allowScanningByMediaScanner();
                 }
                 while (it.hasNextKey()) {
@@ -486,8 +486,11 @@ public class RNFetchBlobReq extends BroadcastReceiver implements Runnable {
                             scannable = notifyConfig.getBoolean("mediaScannable");
                         if(notifyConfig.hasKey("notification"))
                             notification = notifyConfig.getBoolean("notification");
-                        DownloadManager dm = (DownloadManager)RNFetchBlob.RCTContext.getSystemService(RNFetchBlob.RCTContext.DOWNLOAD_SERVICE);
-                        dm.addCompletedDownload(title, desc, scannable, mime, destPath, contentLength, notification);
+                        // Not working on Android 10 above
+                        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+                            DownloadManager dm = (DownloadManager)RNFetchBlob.RCTContext.getSystemService(RNFetchBlob.RCTContext.DOWNLOAD_SERVICE);
+                            dm.addCompletedDownload(title, desc, scannable, mime, destPath, contentLength, notification);
+                        }
                     }
 
                     done(response);
